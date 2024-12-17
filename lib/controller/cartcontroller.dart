@@ -9,7 +9,8 @@ class CartController extends GetxController {
   List<CartModel> cart = [];
   bool isLoading = false;
   RxDouble price = 0.0.obs;
-  Map<List<CartModel>, int> cartItems = {};
+
+  Map<int, int> productQuantities = {};
   Future<void> getAllProducts() async {
     try {
       isLoading = true;
@@ -26,30 +27,48 @@ class CartController extends GetxController {
   }
 
   void addtoCart(CartModel model) {
-    cart.add(model);
+    if (!cart.any((item) => item.id == model.id)) {
+      cart.add(model);
+      productQuantities[model.id] = 1;
+    } else {
+      productQuantities[model.id] = productQuantities[model.id]! + 1;
+    }
+    totalPrice();
+    update(['cart-items']);
+    update(['products']);
+  }
 
+  void addItemQuantity(int productId) {
+    if (productQuantities.containsKey(productId)) {
+      productQuantities[productId] = productQuantities[productId]! + 1;
+      totalPrice();
+      update(['cart-items']);
+    }
+  }
+
+  void removeItemQuantity(int productId) {
+    if (productQuantities.containsKey(productId) &&
+        productQuantities[productId]! > 1) {
+      productQuantities[productId] = productQuantities[productId]! - 1;
+      totalPrice();
+      update(['cart-items']);
+    }
+  }
+
+  void totalPrice() {
+    double total = 0.0;
     for (var item in cart) {
-      price.value = item.price + price.value;
+      total += item.price * (productQuantities[item.id] ?? 1);
     }
-
-    log(cart.length.toString());
-    update(['products']);
-    update(['cart-items']);
+    price.value = total;
   }
 
-  void deleteProduct(int index, double productprice) {
+  void deleteProduct(int index) {
     cart.removeAt(index);
-    price.value = price.value - productprice;
-    update(['products']);
+    totalPrice();
     update(['cart-items']);
+    update(['products']);
   }
 
-  void updateCartItem(CartModel model) {
-    for (var item in cartItems.entries) {
-      if (item.key.single.title == model.title) {
-        // cartItems[item.key] = ((cartItems[item.key[model]])! + 1) ;
-        log(item.key.single.title);
-      }
-    }
-  }
+
 }

@@ -1,12 +1,4 @@
-// To parse this JSON data, do
-//
-//     final cartModel = cartModelFromJson(jsonString);
-
-// import 'dart:convert';
-
-// List<CartModel> cartModelFromJson(String str) => List<CartModel>.from(json.decode(str).map((x) => CartModel.fromJson(x)));
-
-// String cartModelToJson(List<CartModel> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+// ignore_for_file: constant_identifier_names
 
 class CartModel {
   int id;
@@ -48,7 +40,12 @@ class CartModel {
       };
 }
 
-enum Category { ELECTRONICS, JEWELERY, MEN_S_CLOTHING, WOMEN_S_CLOTHING }
+enum Category {
+  ELECTRONICS,
+  JEWELERY,
+  MEN_S_CLOTHING,
+  WOMEN_S_CLOTHING,
+}
 
 final categoryValues = EnumValues({
   "electronics": Category.ELECTRONICS,

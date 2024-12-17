@@ -1,5 +1,6 @@
 import 'package:cart_task/controller/cartcontroller.dart';
-import 'package:cart_task/model/cart_model.dart';
+import 'package:cart_task/widgets/appbar.dart';
+import 'package:cart_task/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -10,75 +11,30 @@ class CartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('my cart'),
-        centerTitle: true,
-      ),
+      appBar: appBarWidget('My Cart'),
       body: GetBuilder<CartController>(
         id: 'cart-items',
         builder: (c) {
           return c.cart.isEmpty
               ? Center(child: Text('Cart is empty'))
-              : ListView.separated(
-                  itemCount: c.cart.length,
-                  itemBuilder: (context, index) {
-                    final data = c.cart[index];
-                    return ListTile(
-                      tileColor: const Color.fromARGB(255, 232, 229, 229),
-                      leading: Image.network(
-                        data.image,
-                        fit: BoxFit.contain,
-                      ),
-                      title: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            data.title,
-                            overflow: TextOverflow.clip,
-                            maxLines: 2,
-                            style: TextStyle(
-                                fontSize: 12, fontWeight: FontWeight.w500),
-                          ),
-                          Text(
-                            'size: XL',
-                            style: TextStyle(fontSize: 12),
-                          ),
-                          Text(
-                            data.price.toString(),
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.w500),
-                          ),
-                        ],
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                              onPressed: () {
-                                // log('item.key.single.title');
-                                CartModel model = CartModel(
-                                    title: data.title,
-                                    image: data.image,
-                                    price: data.price,
-                                    rating: data.rating,
-                                    id: data.id,
-                                    description: data.description,
-                                    category: data.category);
-                                controller.updateCartItem(model);
-                              },
-                              icon: Icon(Icons.minimize)),
-                          Text('1'),
-                          IconButton(onPressed: () {}, icon: Icon(Icons.add)),
-                          SizedBox(width: 8),
-                          IconButton(
-                            onPressed: () => c.deleteProduct(index, data.price),
-                            icon: Icon(Icons.delete),
-                          )
-                        ],
-                      ),
-                    );
-                  },
-                  separatorBuilder: (context, index) => SizedBox(height: 5),
+              : Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ListView.separated(
+                    itemCount: c.cart.length,
+                    itemBuilder: (context, index) {
+                      final data = c.cart[index];
+                      return cartItems(
+                        image: data.image,
+                        title: data.title,
+                        price: data.price.toString(),
+                        quantity: '${c.productQuantities[data.id] ?? 1}',
+                        onPressRemove: () => c.removeItemQuantity(data.id),
+                        onPressAdd: () => c.addItemQuantity(data.id),
+                        onPressDelete: () => c.deleteProduct(index),
+                      );
+                    },
+                    separatorBuilder: (context, index) => SizedBox(height: 5),
+                  ),
                 );
         },
       ),
@@ -96,7 +52,7 @@ class CartScreen extends StatelessWidget {
             Obx(
               () => Text(
                 '₹ ${controller.price.toString()}',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.white,fontSize: 18,fontWeight: FontWeight.bold),
               ),
             ),
             TextButton(
